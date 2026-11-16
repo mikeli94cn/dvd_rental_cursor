@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -57,23 +58,24 @@ class RentalFlowIntegrationTest extends AbstractIntegrationTest {
     void setUp() {
         Role customerRole = roleRepository.findByName("CUSTOMER").orElseThrow();
         Role staffRole = roleRepository.findByName("STAFF").orElseThrow();
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
 
-        customerEmail = "renter@example.com";
-        otherEmail = "other@example.com";
-        staffEmail = "clerk@example.com";
+        customerEmail = "renter-" + suffix + "@example.com";
+        otherEmail = "other-" + suffix + "@example.com";
+        staffEmail = "clerk-" + suffix + "@example.com";
         createCustomer(customerEmail, "Rent", "Er", customerRole);
         createCustomer(otherEmail, "Other", "Person", customerRole);
         createStaff(staffEmail, staffRole);
 
         Movie movie = new Movie();
-        movie.setTitle("Flow Film");
+        movie.setTitle("Flow Film " + suffix);
         movie.setDailyRate(new BigDecimal("2.00"));
         movie.setRentalDaysDefault(3);
         movie = movieRepository.save(movie);
 
         DvdCopy copy = new DvdCopy();
         copy.setMovie(movie);
-        copy.setBarcode("FLOW-001");
+        copy.setBarcode("FLOW-" + suffix);
         copy.setStatus(DvdCopyStatus.AVAILABLE);
         copyId = dvdCopyRepository.save(copy).getId();
     }

@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,21 +57,22 @@ class ConcurrentRentalIntegrationTest extends AbstractIntegrationTest {
     @BeforeEach
     void setUp() {
         Role customerRole = roleRepository.findByName("CUSTOMER").orElseThrow();
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
 
-        customer1Email = "race1@example.com";
-        customer2Email = "race2@example.com";
+        customer1Email = "race1-" + suffix + "@example.com";
+        customer2Email = "race2-" + suffix + "@example.com";
         createCustomer(customer1Email, "Race", "One", customerRole);
         createCustomer(customer2Email, "Race", "Two", customerRole);
 
         Movie movie = new Movie();
-        movie.setTitle("Race Film");
+        movie.setTitle("Race Film " + suffix);
         movie.setDailyRate(new BigDecimal("1.00"));
         movie.setRentalDaysDefault(2);
         movie = movieRepository.save(movie);
 
         DvdCopy copy = new DvdCopy();
         copy.setMovie(movie);
-        copy.setBarcode("RACE-COPY-001");
+        copy.setBarcode("RACE-" + suffix);
         copy.setStatus(DvdCopyStatus.AVAILABLE);
         copy = dvdCopyRepository.save(copy);
         copyId = copy.getId();
